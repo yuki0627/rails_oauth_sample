@@ -3,7 +3,7 @@ class Customer < ApplicationRecord
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, 
-         :omniauthable, omniauth_providers: %i(google)
+         :omniauthable, omniauth_providers: %i(google facebook)
 
   def self.create_unique_string
     SecureRandom.uuid
@@ -18,6 +18,20 @@ class Customer < ApplicationRecord
                       uid:      auth.uid,
                       password: Devise.friendly_token[0, 20],
                                    )
+    end
+    customer.save
+    customer
+  end
+
+  def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
+    customer = Customer.find_by(provider: auth.provider, uid: auth.uid)
+
+    unless customer
+      customer = Customer.new(provider: auth.provider,
+                      uid:      auth.uid,
+                      email:    auth.info.email,
+                      password: Devise.friendly_token[0, 20]
+      )
     end
     customer.save
     customer
