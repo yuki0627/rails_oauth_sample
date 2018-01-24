@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get 'oauth/index'
+  root :to => 'oauth#index'
 
   devise_for :customers, controllers: {
     registrations: "customers/registrations",
